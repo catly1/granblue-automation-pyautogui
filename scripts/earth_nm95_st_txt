@@ -1,0 +1,66 @@
+# This script will execute the following commands on Turn 1, attack for Turns 2-4, and 
+# then will exit the raid on Turn 5 for the purposes of joining another one.
+
+Turn 1:
+    summon(5)
+    character1.useSkill(4)
+    character2.useSkill(1)
+    character4.useSkill(3).useSkill(1).useSkill(2)
+    character3.useSkill(1).useSkill(2)
+end
+
+Turn 2:
+	character1.useSkill(1).useSkill(2).useSkill(3)
+end
+
+Turn 3:
+    summon(1)
+    character3.useSkill(3).select_a_character(2)
+    character2.useSkill(3)
+end
+
+Turn 6:
+    usegreenpotion.target(1)
+    summon(6)
+end
+
+
+Turn 7:
+    character1.useSkill(1).useSkill(4)
+    character2.useSkill(1)
+end
+
+Turn 8:
+    summon(3)
+    character2.useSkill(3)
+    character4.useSkill(1)
+    character4.useSkill(2)
+end
+
+Turn 9:
+    summon(3)
+    character2.useSkill(3)
+    character1.useSkill(2)
+end
+
+Turn 10:
+    character3.useSkill(1).useSkill(2)
+end
+
+Turn 11:
+    summon(4)
+    character2.useSkill(4)
+end
+
+Turn 12:
+    summon(1)
+end
+
+Turn 14:
+    summon(2)
+end
+
+Turn 15:
+    summon(6)
+    enableFullAuto
+end

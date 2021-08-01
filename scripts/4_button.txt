@@ -1,0 +1,7 @@
+# This script will execute the following commands on Turn 1, attack for Turns 2-4, and 
+# then will exit the raid on Turn 5 for the purposes of joining another one.
+
+Turn 1:
+	character1.useSkill(1).useSkill(2).useSkill(3)
+	character2.useSkill(1)
+end
