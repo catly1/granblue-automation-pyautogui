@@ -182,7 +182,6 @@ class Game:
 
         # Enable checking for Skyscope mission popups.
         self.enable_skyscope = True
-
         if test_mode is False:
             # Calibrate the dimensions of the bot window on bot launch.
             self.go_back_home(confirm_location_check = True, display_info_check = True)
@@ -372,6 +371,7 @@ class Game:
             return None
         except RuntimeError:
             self.print_and_save(f"\n[ERROR] Bot encountered exception while checking for CAPTCHA: \n{traceback.format_exc()}")
+            self.discord_queue.put(f"> Bot encountered exception while checking for CAPTCHA: \n{traceback.format_exc()}")
             self.image_tools.generate_alert_for_captcha()
             self._is_bot_running.value = 1
             self.wait(1)
@@ -472,16 +472,16 @@ class Game:
                 self.wait(3)
 
                 # Close the popup and then retreat from this Trial Battle.
-                if self.image_tools.confirm_location("trial_battles_description"):
-                    self.find_and_click_button("close")
+                if self.image_tools.confirm_location("trial_battles_description", tries = 10):
+                    self.find_and_click_button("close", tries = 5)
 
-                    self.find_and_click_button("menu")
-                    self.find_and_click_button("retreat")
-                    self.find_and_click_button("retreat_confirmation")
-                    self.find_and_click_button("next")
+                    self.find_and_click_button("menu", tries = 5)
+                    self.find_and_click_button("retreat", tries = 5)
+                    self.find_and_click_button("retreat_confirmation", tries = 5)
+                    self.go_back_home()
 
-        if self.image_tools.confirm_location("trial_battles"):
-            self.print_and_save("[SUCCESS] Summons have now been refreshed.")
+                if self.image_tools.confirm_location("home"):
+                    self.print_and_save("[SUCCESS] Summons have now been refreshed.")
 
         return None
 
@@ -1374,9 +1374,9 @@ class Game:
 
                 elif start_check is False:
                     raise Exception("Failed to arrive at the Summon Selection screen after selecting the Mission.")
-        except Exception:
+        except Exception as e:
             self.print_and_save(f"\n[ERROR] Bot encountered exception in Farming Mode: \n{traceback.format_exc()}")
-            self.discord_queue.put(f"[ERROR] Bot encountered exception in Farming Mode: \n{traceback.format_exc()}")
+            self.discord_queue.put(f"> Bot encountered exception in Farming Mode: \n{e}")
 
         self.print_and_save("\n################################################################################")
         self.print_and_save("################################################################################")
