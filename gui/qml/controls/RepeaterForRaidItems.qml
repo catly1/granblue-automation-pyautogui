@@ -88,7 +88,7 @@ Flickable {
                 "Lucilius": ["Dark Residue", "Shadow Substance"],
                 "Ultimate Bahamut": ["Michael Anima", "Gabriel Anima", "Uriel Anima", "Raphael Anima", "Meteorite Fragment", "Meteorite", "Silver Centrum", "Ultima Unit", "Athena Anima", "Athena Omega Anima", "Grani Anima", "Grani Omega Anima", "Baal Anima", "Baal Omega Anima", "Garuda Anima", "Garuda Omega Anima", "Odin Anima", "Odin Omega Anima", "Lich Anima", "Lich Omega Anima"],
                 "Lindwurm": ["Golden Scale", "Lineage Fragment"],
-                "HuangLong and Qilin": ["Huanglong Anima", "Huanglong Omega Anima"]
+                "HuangLong": ["Huanglong Anima", "Huanglong Omega Anima"]
             }
 
             function createListElement(itemName){
