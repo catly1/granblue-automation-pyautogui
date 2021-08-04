@@ -102,7 +102,7 @@ Flickable {
 
         ///////// Raid Items - HuangLong Omega /////////
         Label {
-            id: label_HuangLongOmega
+            id: label_HuangLong
 
             color: "#00ff00"
             anchors.left: parent.left
@@ -112,24 +112,24 @@ Flickable {
             font.pointSize: 15
             font.letterSpacing: 1
 
-            text: "HuangLong Omega"
+            text: "HuangLong"
         }
 
         Repeater {
-            id: repeater_HuangLongOmega
+            id: repeater_HuangLong
             model: ListModel { }
 
             onVisibleChanged: {
-                if(repeater_HuangLongOmega.visible === true){
-                    repeater_HuangLongOmega.model.clear()
-                    for(var i = 0; i < itemsModel.listOfItems[label_HuangLongOmega.text].length; i++){
-                        repeater_HuangLongOmega.model.append(itemsModel.createListElement(itemsModel.listOfItems[label_HuangLongOmega.text][i]))
+                if(repeater_HuangLong.visible === true){
+                    repeater_HuangLong.model.clear()
+                    for(var i = 0; i < itemsModel.listOfItems[label_HuangLong.text].length; i++){
+                        repeater_HuangLong.model.append(itemsModel.createListElement(itemsModel.listOfItems[label_HuangLongOmega.text][i]))
                     }
                 }
             }
 
             Image {
-                id: itemImage_HuangLongOmega
+                id: itemImage_HuangLong
                 source: imageSource
                 width: 35
                 height: 40
@@ -146,7 +146,7 @@ Flickable {
 
                 Label {
                     color: "#00ff00"
-                    anchors.left: itemImage_HuangLongOmega.right
+                    anchors.left: itemImage_HuangLong.right
                     anchors.leftMargin: 12
                     font.letterSpacing: 1
                     font.pointSize: 10
