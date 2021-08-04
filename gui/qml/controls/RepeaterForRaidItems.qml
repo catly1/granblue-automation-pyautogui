@@ -87,7 +87,8 @@ Flickable {
                 "Akasha": ["Hollow Key"],
                 "Lucilius": ["Dark Residue", "Shadow Substance"],
                 "Ultimate Bahamut": ["Michael Anima", "Gabriel Anima", "Uriel Anima", "Raphael Anima", "Meteorite Fragment", "Meteorite", "Silver Centrum", "Ultima Unit", "Athena Anima", "Athena Omega Anima", "Grani Anima", "Grani Omega Anima", "Baal Anima", "Baal Omega Anima", "Garuda Anima", "Garuda Omega Anima", "Odin Anima", "Odin Omega Anima", "Lich Anima", "Lich Omega Anima"],
-                "Lindwurm": ["Golden Scale", "Lineage Fragment"]
+                "Lindwurm": ["Golden Scale", "Lineage Fragment"],
+                "HuangLong and Qilin": ["Huanglong Anima", "Huanglong Omega Anima"]
             }
 
             function createListElement(itemName){
@@ -98,6 +99,62 @@ Flickable {
                 }
             }
         }
+
+        ///////// Raid Items - HuangLong Omega /////////
+        Label {
+            id: label_HuangLongOmega
+
+            color: "#00ff00"
+            anchors.left: parent.left
+            horizontalAlignment: Text.AlignHCenter
+            font.bold: true
+            font.underline: true
+            font.pointSize: 15
+            font.letterSpacing: 1
+
+            text: "HuangLong Omega"
+        }
+
+        Repeater {
+            id: repeater_HuangLongOmega
+            model: ListModel { }
+
+            onVisibleChanged: {
+                if(repeater_HuangLongOmega.visible === true){
+                    repeater_HuangLongOmega.model.clear()
+                    for(var i = 0; i < itemsModel.listOfItems[label_HuangLongOmega.text].length; i++){
+                        repeater_HuangLongOmega.model.append(itemsModel.createListElement(itemsModel.listOfItems[label_HuangLongOmega.text][i]))
+                    }
+                }
+            }
+
+            Image {
+                id: itemImage_HuangLongOmega
+                source: imageSource
+                width: 35
+                height: 40
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: {
+                        backend.update_item_name(name)
+                        raidItemsPopup.close()
+                        itemSelectionButton.text = name
+                    }
+                }
+
+                Label {
+                    color: "#00ff00"
+                    anchors.left: itemImage_HuangLongOmega.right
+                    anchors.leftMargin: 12
+                    font.letterSpacing: 1
+                    font.pointSize: 10
+                    text: name
+                }
+            }
+        }
+        ///////// End of Raid Items - HuangLong Omega /////////
 
         ///////// Raid Items - Tiamat Omega /////////
         Label {

@@ -218,7 +218,7 @@ class ImageUtils:
             # First select the Summon Element tab at the current index.
             self._game.print_and_save(f"[INFO] Now attempting to find: {summon_list[summon_index].upper()}")
             current_summon_element = summon_element_list[summon_index]
-            self._game.find_and_click_button(f"summon_{current_summon_element}")
+            # self._game.find_and_click_button(f"summon_{current_summon_element}")
 
             while summon_location is None and summon_index <= len(summon_list):
                 # Now try and find the Summon at the current index.

@@ -496,71 +496,71 @@ class Game:
         Returns:
             (bool): Returns False if it detects the "Raid is full/Raid is already done" dialog. Otherwise, return True.
         """
-        # Find the Group that the Party is in first. If the specified Group number is less than 8, it is in Set A. Otherwise, it is in Set B. If failed, alternate searching for Set A / Set B until
-        # found or tries are depleted.
-        set_location = None
-        if group_number < 8:
-            while set_location is None:
-                set_location = self.image_tools.find_button("party_set_a", tries = 1)
-                if set_location is None:
-                    tries -= 1
-                    if tries <= 0:
-                        raise Exception("Could not find Set A.")
+        # # Find the Group that the Party is in first. If the specified Group number is less than 8, it is in Set A. Otherwise, it is in Set B. If failed, alternate searching for Set A / Set B until
+        # # found or tries are depleted.
+        # set_location = None
+        # if group_number < 8:
+        #     while set_location is None:
+        #         set_location = self.image_tools.find_button("party_set_a", tries = 1)
+        #         if set_location is None:
+        #             tries -= 1
+        #             if tries <= 0:
+        #                 raise Exception("Could not find Set A.")
 
-                    # See if the user had Set B active instead of Set A if matching failed.
-                    set_location = self.image_tools.find_button("party_set_b", tries = 1)
-        else:
-            while set_location is None:
-                set_location = self.image_tools.find_button("party_set_b", tries = 1)
-                if set_location is None:
-                    tries -= 1
-                    if tries <= 0:
-                        raise Exception("Could not find Set B.")
+        #             # See if the user had Set B active instead of Set A if matching failed.
+        #             set_location = self.image_tools.find_button("party_set_b", tries = 1)
+        # else:
+        #     while set_location is None:
+        #         set_location = self.image_tools.find_button("party_set_b", tries = 1)
+        #         if set_location is None:
+        #             tries -= 1
+        #             if tries <= 0:
+        #                 raise Exception("Could not find Set B.")
 
-                    # See if the user had Set A active instead of Set B if matching failed.
-                    set_location = self.image_tools.find_button("party_set_a", tries = 1)
+        #             # See if the user had Set A active instead of Set B if matching failed.
+        #             set_location = self.image_tools.find_button("party_set_a", tries = 1)
 
-        # Center the mouse on the "Set A" / "Set B" button and then click the correct Group tab.
-        if self._debug_mode:
-            self.print_and_save(f"\n[DEBUG] Successfully selected the correct Set. Now selecting Group {group_number}...")
+        # # Center the mouse on the "Set A" / "Set B" button and then click the correct Group tab.
+        # if self._debug_mode:
+        #     self.print_and_save(f"\n[DEBUG] Successfully selected the correct Set. Now selecting Group {group_number}...")
 
-        if group_number == 1:
-            x = set_location[0] - 350
-        elif group_number == 2:
-            x = set_location[0] - 290
-        elif group_number == 3:
-            x = set_location[0] - 230
-        elif group_number == 4:
-            x = set_location[0] - 170
-        elif group_number == 5:
-            x = set_location[0] - 110
-        elif group_number == 6:
-            x = set_location[0] - 50
-        else:
-            x = set_location[0] + 10
+        # if group_number == 1:
+        #     x = set_location[0] - 350
+        # elif group_number == 2:
+        #     x = set_location[0] - 290
+        # elif group_number == 3:
+        #     x = set_location[0] - 230
+        # elif group_number == 4:
+        #     x = set_location[0] - 170
+        # elif group_number == 5:
+        #     x = set_location[0] - 110
+        # elif group_number == 6:
+        #     x = set_location[0] - 50
+        # else:
+        #     x = set_location[0] + 10
 
-        y = set_location[1] + 50
-        self.mouse_tools.move_and_click_point(x, y, "template_group", mouse_clicks = 2)
+        # y = set_location[1] + 50
+        # self.mouse_tools.move_and_click_point(x, y, "template_group", mouse_clicks = 2)
 
-        # Now select the correct Party.
-        if self._debug_mode:
-            self.print_and_save(f"[DEBUG] Successfully selected Group {group_number}. Now selecting Party {party_number}...")
+        # # Now select the correct Party.
+        # if self._debug_mode:
+        #     self.print_and_save(f"[DEBUG] Successfully selected Group {group_number}. Now selecting Party {party_number}...")
 
-        if party_number == 1:
-            x = set_location[0] - 309
-        elif party_number == 2:
-            x = set_location[0] - 252
-        elif party_number == 3:
-            x = set_location[0] - 195
-        elif party_number == 4:
-            x = set_location[0] - 138
-        elif party_number == 5:
-            x = set_location[0] - 81
-        elif party_number == 6:
-            x = set_location[0] - 24
+        # if party_number == 1:
+        #     x = set_location[0] - 309
+        # elif party_number == 2:
+        #     x = set_location[0] - 252
+        # elif party_number == 3:
+        #     x = set_location[0] - 195
+        # elif party_number == 4:
+        #     x = set_location[0] - 138
+        # elif party_number == 5:
+        #     x = set_location[0] - 81
+        # elif party_number == 6:
+        #     x = set_location[0] - 24
 
-        y = set_location[1] + 325
-        self.mouse_tools.move_and_click_point(x, y, "template_party", mouse_clicks = 2)
+        # y = set_location[1] + 325
+        # self.mouse_tools.move_and_click_point(x, y, "template_party", mouse_clicks = 2)
 
         if self._debug_mode:
             self.print_and_save(f"[DEBUG] Successfully selected Party {party_number}. Now starting the mission.")
@@ -1362,7 +1362,7 @@ class Game:
                                 self._map_selection.check_for_pending(farming_mode)
 
                                 # Now join a new Raid.
-                                self._map_selection.join_raid(mission_name)
+                                self._map_selection.join_again(mission_name)
                         else:
                             # Join a new Raid.
                             self._map_selection.join_raid(mission_name)

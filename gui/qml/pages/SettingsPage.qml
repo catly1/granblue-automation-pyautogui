@@ -1101,6 +1101,14 @@ Item{
                         ]
                     }
 
+                    //HuangLong and Qilin
+                    else if(itemSelectionButton.text === "Huanglong Anima" || itemSelectionButton.text === "Huanglong Omega Anima") {
+                        missionSelectionComboBox.model = [
+                            { text: "HuangLong and Qilin", enabled: false },
+                            { text: "Huanglong & Qilin (Impossible)", map: "", enabled: true },
+                        ]
+                    }
+
                     // Olden Primal and Primal Weapons
                     else if(itemSelectionButton.text === "Twin Elements Anima" || itemSelectionButton.text === "Twin Elements Omega Anima" || itemSelectionButton.text === "Ancient Ecke Sachs" || itemSelectionButton.text === "Ecke Sachs") {
                         missionSelectionComboBox.model = [
