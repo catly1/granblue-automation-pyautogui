@@ -123,7 +123,7 @@ Flickable {
                 if(repeater_HuangLong.visible === true){
                     repeater_HuangLong.model.clear()
                     for(var i = 0; i < itemsModel.listOfItems[label_HuangLong.text].length; i++){
-                        repeater_HuangLong.model.append(itemsModel.createListElement(itemsModel.listOfItems[label_HuangLongOmega.text][i]))
+                        repeater_HuangLong.model.append(itemsModel.createListElement(itemsModel.listOfItems[label_HuangLong.text][i]))
                     }
                 }
             }
