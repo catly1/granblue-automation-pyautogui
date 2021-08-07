@@ -605,8 +605,8 @@ delay_in_seconds_upper_bound = 60
 ############################################################
 
 [dimensional_halo]
-enable_dimensional_halo = False
-dimensional_halo_combat_script =
+enable_dimensional_halo = True
+dimensional_halo_combat_script = "C:\Projects\granblue-automation-pyautogui\scripts\full_auto.txt"
 dimensional_halo_summon_list =
 dimensional_halo_summon_element_list =
 dimensional_halo_group_number =
