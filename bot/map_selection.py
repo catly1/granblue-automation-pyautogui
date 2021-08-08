@@ -408,7 +408,7 @@ class MapSelection:
 
                         elif map_name == "Elemental Treasure Quests":
                             # Start up the specified Elemental Treasure Quest mission.
-                            self._game.print_and_save(f"[INFO] Selecting {mission_name}...")
+                            self._game.print_and_save(f"[INFO] Selecting {mission_name}...")# Check for the "You retreated from the raid battle" popup.
                             round_difficulty_play_button_locations = self._game.image_tools.find_all("play_round_button")
 
                             if formatted_mission_name == "The Hellfire Trial":
@@ -1141,31 +1141,39 @@ class MapSelection:
         # Then navigate to the Quest screen.
         self._game.find_and_click_button("quest", suppress_error = True)
 
-        # Check for the "You retreated from the raid battle" popup.
         self._game.wait(1)
+
+        # Check for the "You retreated from the raid battle" popup.
         if self._game.image_tools.confirm_location("you_retreated_from_the_raid_battle", tries = 1):
             self._game.find_and_click_button("ok")
 
         # Check for any Pending Battles popup.
-        self.check_for_pending("raid")
+        if self.check_for_pending("raid"):
+            self._game.find_and_click_button("quest")
 
         # Now navigate to the Raid screen.
-        self._game.find_and_click_button("raid", suppress_error = True)
+        self._game.find_and_click_button("raid")
 
         if self._game.image_tools.confirm_location("raid"):
             # Check for any joined raids.
             self._check_for_joined()
 
             if self._raids_joined >= 3:
-                # If the maximum number of raids has been joined, collect any pending rewards with a interval of 60 seconds in between until the number of joined raids is below 3.
+                # If the maximum number of raids has been joined, collect any pending rewards with a interval of 30 seconds in between until the number of joined raids is below 3.
                 while self._raids_joined >= 3:
-                    self._game.print_and_save(f"\n[INFO] Maximum raids of 3 has been joined. Waiting 60 seconds to see if any finish.")
+                    self._game.print_and_save(f"\n[INFO] Maximum raids of 3 has been joined. Waiting 30 seconds to see if any finish.")
+                    self._game.wait(30)
+
                     self._game.go_back_home(confirm_location_check = True)
+                    self._game.find_and_click_button("quest")
 
-                    self._game.wait(60)
+                    if self.check_for_pending("raid"):
+                        self._game.find_and_click_button("quest")
+                        self._game.wait(1)
 
-                    self._game.find_and_click_button("quest", suppress_error = True)
-                    self.check_for_pending("raid")
+                    self._game.find_and_click_button("raid")
+                    self._game.wait(1)
+                    self._check_for_joined()
 
             # Click on the "Enter ID" button.
             self._game.print_and_save(f"\n[INFO] Now moving to the \"Enter ID\" screen.")
@@ -1195,8 +1203,7 @@ class MapSelection:
                     self._game.mouse_tools.move_and_click_point(join_room_button[0], join_room_button[1], "join_a_room")
 
                     # If the room code is valid and the raid is able to be joined, break out and head to the Summon Selection screen.
-                    if not self._game.image_tools.confirm_location("raid_already_ended", tries = 1) and not self.check_for_pending("raid") and not self._game.image_tools.confirm_location(
-                            "invalid_code", tries = 1):
+                    if self._game.find_and_click_button("ok") is False:
                         # Check for EP.
                         self._game.check_for_ep()
 
@@ -1205,8 +1212,14 @@ class MapSelection:
 
                         return self._game.image_tools.confirm_location("select_a_summon")
                     else:
-                        self._game.print_and_save(f"[WARNING] {room_code} already ended or invalid.")
-                        self._game.find_and_click_button("ok")
+                        if self.check_for_pending("raid") is False:
+                            self._game.print_and_save(f"[WARNING] {room_code} already ended or invalid.")
+                            self._game.find_and_click_button("ok")
+                        else:
+                            # Move from the Home screen back to the Backup Requests screen after clearing out all the Pending Battles.
+                            self._game.find_and_click_button("quest")
+                            self._game.find_and_click_button("raid")
+                            self._game.find_and_click_button("enter_id")
 
                 tries -= 1
                 self._game.print_and_save(f"\n[WARNING] Could not find any valid room codes. \nWaiting 60 seconds and then trying again with {tries} tries left before exiting.")
