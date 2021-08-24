@@ -224,10 +224,10 @@ class ImageUtils:
                 raise Exception("Could not reach the Summon Selection screen.")
 
         while summon_location is None:
-            current_summon_element = summon_element_list[summon_index]
-            if current_summon_element != last_summon_element:
-                self._game.find_and_click_button(f"summon_{current_summon_element}")
-                last_summon_element = current_summon_element
+            # current_summon_element = summon_element_list[summon_index]
+            # if current_summon_element != last_summon_element:
+            #     self._game.find_and_click_button(f"summon_{current_summon_element}")
+            #     last_summon_element = current_summon_element
 
             summon_index = 0
             while summon_index <= len(summon_list):
