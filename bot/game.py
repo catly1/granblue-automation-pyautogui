@@ -1359,7 +1359,7 @@ class Game:
                                 self._delay_between_runs()
 
                                 # Clear away any Pending Battles.
-                                self._map_selection.check_for_pending(farming_mode)
+                                # self._map_selection.check_for_pending(farming_mode)
 
                                 # Now join a new Raid.
                                 self._map_selection.join_again(mission_name)
