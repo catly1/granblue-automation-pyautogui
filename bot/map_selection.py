@@ -100,8 +100,7 @@ class MapSelection:
                         self._game.wait(1)
                     else:
                         # When there are no more Pending Battles, go back to the Quests screen.
-                        # self._game.find_and_click_button("quests", suppress_error = True)
-                        self._game.find_and_click_button("event_home", suppress_error = True)
+                        self._game.find_and_click_button("quests", suppress_error = True)
 
                         # Close the Skyscope mission popup.
                         if self._game.enable_skyscope and self._game.image_tools.confirm_location("skyscope"):
@@ -1151,7 +1150,6 @@ class MapSelection:
         # Check for any Pending Battles popup.
         if self.check_for_pending("raid"):
             self._game.find_and_click_button("quest")
-            # self._game.find_and_click_button("event_home")
 
         # Now navigate to the Raid screen.
         self._game.find_and_click_button("raid")
@@ -1167,7 +1165,6 @@ class MapSelection:
                     self._game.wait(30)
 
                     self._game.go_back_home(confirm_location_check = True)
-                    # self._game.find_and_click_button("event_home")
                     self._game.find_and_click_button("quest")
 
                     if self.check_for_pending("raid"):
@@ -1269,7 +1266,6 @@ class MapSelection:
                     self._game.wait(60)
 
                     self._game.find_and_click_button("quest", suppress_error = True)
-                    # self._game.find_and_click_button("event_home", suppress_error = True)
                     # self.check_for_pending("raid")
 
             # Click on the "Enter ID" button.
