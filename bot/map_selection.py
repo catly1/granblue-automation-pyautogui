@@ -1150,7 +1150,8 @@ class MapSelection:
 
         # Check for any Pending Battles popup.
         if self.check_for_pending("raid"):
-            self._game.find_and_click_button("quest")
+            # self._game.find_and_click_button("quest")
+            self._game.find_and_click_button("event_home")
 
         # Now navigate to the Raid screen.
         self._game.find_and_click_button("raid")
@@ -1169,7 +1170,8 @@ class MapSelection:
                     self._game.find_and_click_button("quest")
 
                     if self.check_for_pending("raid"):
-                        self._game.find_and_click_button("quest")
+                        # self._game.find_and_click_button("quest")
+                        self._game.find_and_click_button("event_home")
                         self._game.wait(1)
 
                     self._game.find_and_click_button("raid")
@@ -1267,6 +1269,7 @@ class MapSelection:
                     self._game.wait(60)
 
                     self._game.find_and_click_button("quest", suppress_error = True)
+                    # self._game.find_and_click_button("event_home", suppress_error = True)
                     self.check_for_pending("raid")
 
             # Click on the "Enter ID" button.
