@@ -1149,8 +1149,8 @@ class MapSelection:
             self._game.find_and_click_button("ok")
 
         # Check for any Pending Battles popup.
-        # if self.check_for_pending("raid"):
-            # self._game.find_and_click_button("quest")
+        if self.check_for_pending("raid"):
+            self._game.find_and_click_button("quest")
             # self._game.find_and_click_button("event_home")
 
         # Now navigate to the Raid screen.
@@ -1167,12 +1167,12 @@ class MapSelection:
                     self._game.wait(30)
 
                     self._game.go_back_home(confirm_location_check = True)
+                    # self._game.find_and_click_button("event_home")
                     self._game.find_and_click_button("quest")
 
-                    # if self.check_for_pending("raid"):
-                        # self._game.find_and_click_button("quest")
-                        # self._game.find_and_click_button("event_home")
-                        # self._game.wait(1)
+                    if self.check_for_pending("raid"):
+                        self._game.find_and_click_button("quest")
+                        self._game.wait(1)
 
                     self._game.find_and_click_button("raid")
                     self._game.wait(1)
@@ -1214,15 +1214,15 @@ class MapSelection:
                         self._raids_joined += 1
 
                         return self._game.image_tools.confirm_location("select_a_summon")
-                    # else:
-                    #     # if self.check_for_pending("raid") is False:
-                    #         self._game.print_and_save(f"[WARNING] {room_code} already ended or invalid.")
-                    #         self._game.find_and_click_button("ok")
-                    #     else:
-                    #         # Move from the Home screen back to the Backup Requests screen after clearing out all the Pending Battles.
-                    #         self._game.find_and_click_button("quest")
-                    #         self._game.find_and_click_button("raid")
-                    #         self._game.find_and_click_button("enter_id")
+                    else:
+                        if self.check_for_pending("raid") is False:
+                            self._game.print_and_save(f"[WARNING] {room_code} already ended or invalid.")
+                            self._game.find_and_click_button("ok")
+                        else:
+                            # Move from the Home screen back to the Backup Requests screen after clearing out all the Pending Battles.
+                            self._game.find_and_click_button("quest")
+                            self._game.find_and_click_button("raid")
+                            self._game.find_and_click_button("enter_id")
 
                 tries -= 1
                 self._game.print_and_save(f"\n[WARNING] Could not find any valid room codes. \nWaiting 60 seconds and then trying again with {tries} tries left before exiting.")
@@ -1243,7 +1243,7 @@ class MapSelection:
         # self._game.go_back_home(confirm_location_check = True)
 
         # Then navigate to the Quest screen.
-        self._game.find_and_click_button("quests", suppress_error = True)
+        self._game.find_and_click_button("event_home", suppress_error = True)
 
         # Check for the "You retreated from the raid battle" popup.
         self._game.wait(1)
