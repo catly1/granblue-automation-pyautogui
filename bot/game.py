@@ -322,9 +322,9 @@ class Game:
                 self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "quest_blue", mouse_clicks = clicks)
                 return True
         elif button_name.lower() == "raid":
-            temp_location = self.image_tools.find_button("raid_flat", tries = tries, suppress_error = suppress_error)
+            temp_location = self.image_tools.find_button("raid_flat_event", tries = tries, suppress_error = suppress_error)
             if temp_location is None:
-                temp_location = self.image_tools.find_button("raid_bouncing", tries = tries, suppress_error = suppress_error)
+                temp_location = self.image_tools.find_button("raid_bouncing_event", tries = tries, suppress_error = suppress_error)
 
             if temp_location is not None:
                 self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "raid_flat", mouse_clicks = clicks)
