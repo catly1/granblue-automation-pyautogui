@@ -128,7 +128,8 @@ Item{
                 { text: "Guild Wars", enabled: true },
                 { text: "Dread Barrage", enabled: true },
                 { text: "Proving Grounds", enabled: true },
-                { text: "Xeno Clash", enabled: true }
+                { text: "Xeno Clash", enabled: true },
+                { text: "Arcarum", enabled: true },
             ]
 
             onCurrentIndexChanged: {
@@ -139,7 +140,7 @@ Item{
                 // Display either the Item Selection button or ComboBox depending on the Farming Mode selected.
                 if(farmingModeComboBox.displayText === "Event" || farmingModeComboBox.displayText === "Event (Token Drawboxes)" || farmingModeComboBox.displayText === "Dread Barrage" || 
                 farmingModeComboBox.displayText === "Rise of the Beasts" || farmingModeComboBox.displayText === "Guild Wars" || farmingModeComboBox.displayText === "Proving Grounds" ||
-                farmingModeComboBox.displayText === "Xeno Clash") {
+                farmingModeComboBox.displayText === "Xeno Clash" || farmingModeComboBox.displayText === "Arcarum") {
                     // Set the contents of the Item Selection ComboBox.
                     if(farmingModeComboBox.displayText === "Dread Barrage") {
                         itemSelectionComboBox.model = [
@@ -1101,14 +1102,6 @@ Item{
                         ]
                     }
 
-                    //HuangLong and Qilin
-                    else if(itemSelectionButton.text === "Huanglong Anima" || itemSelectionButton.text === "Huanglong Omega Anima") {
-                        missionSelectionComboBox.model = [
-                            { text: "HuangLong and Qilin", enabled: false },
-                            { text: "Huanglong & Qilin (Impossible)", map: "", enabled: true },
-                        ]
-                    }
-
                     // Olden Primal and Primal Weapons
                     else if(itemSelectionButton.text === "Twin Elements Anima" || itemSelectionButton.text === "Twin Elements Omega Anima" || itemSelectionButton.text === "Ancient Ecke Sachs" || itemSelectionButton.text === "Ecke Sachs") {
                         missionSelectionComboBox.model = [
@@ -1307,6 +1300,11 @@ Item{
                             { text: "Luminiera Malice", enabled: false },
                             { text: "Lvl 150 Luminiera Malice", map: "", enabled: true },
                         ]
+                    } else if(itemSelectionButton.text === "Hive God Anima" || itemSelectionButton.text === "Agonize" || itemSelectionButton.text === "Faceless") {
+                        missionSelectionComboBox.model = [
+                            { text: "Anima-Animus Core", enabled: false },
+                            { text: "Lvl 150 Anima-Animus Core", map: "", enabled: true },
+                        ]
                     }
 
                     // Xeno Items
@@ -1431,6 +1429,36 @@ Item{
                         missionSelectionComboBox.model = [
                             { text: "Four Primarchs", enabled: false },
                             { text: "The Four Primarchs", map: "", enabled: true },
+                        ]
+                    } else if(itemSelectionButton.text === "Huanglong Anima" || itemSelectionButton.text === "Qilin Anima" || itemSelectionButton.text === "Golden Talisman" || itemSelectionButton.text === "Obsidian Talisman") {
+                        missionSelectionComboBox.model = [
+                            { text: "Huanglong and Qilin", enabled: false },
+                            { text: "Huanglong & Qilin (Impossible)", map: "", enabled: true },
+                        ]
+                    } else if(itemSelectionButton.text === "Shenxian Badge") {
+                        missionSelectionComboBox.model = [
+                            { text: "Shenxian", enabled: false },
+                            { text: "Lvl 100 Shenxian", map: "", enabled: true },
+                        ]
+                    } else if(itemSelectionButton.text === "Zhuque Badge") {
+                        missionSelectionComboBox.model = [
+                            { text: "Agni", enabled: false },
+                            { text: "Lvl 90 Agni", map: "", enabled: true },
+                        ]
+                    } else if(itemSelectionButton.text === "Xuanwu Badge") {
+                        missionSelectionComboBox.model = [
+                            { text: "Neptune", enabled: false },
+                            { text: "Lvl 90 Neptune", map: "", enabled: true },
+                        ]
+                    } else if(itemSelectionButton.text === "Baihu Badge") {
+                        missionSelectionComboBox.model = [
+                            { text: "Titan", enabled: false },
+                            { text: "Lvl 90 Titan", map: "", enabled: true },
+                        ]
+                    } else if(itemSelectionButton.text === "Qinglong Badge") {
+                        missionSelectionComboBox.model = [
+                            { text: "Zephyrus", enabled: false },
+                            { text: "Lvl 90 Zephyrus", map: "", enabled: true },
                         ]
                     }
                 }
@@ -1664,6 +1692,7 @@ Item{
                             { text: "EX Xuanwu", map: "", enabled: true },
                             { text: "EX Baihu", map: "", enabled: true },
                             { text: "EX Qinglong", map: "", enabled: true },
+                            { text: "Lvl 100 Shenxian", map: "", enabled: true },
                             { text: "Event Quest", enabled: false },
                             { text: "VH Zhuque", map: "", enabled: true },
                             { text: "VH Xuanwu", map: "", enabled: true },
@@ -1693,6 +1722,13 @@ Item{
                             { text: "Xeno Clash", enabled: false },
                             { text: "Xeno Clash Extreme", enabled: true },
                             { text: "Xeno Clash Raid", enabled: true },
+                        ]
+                    } else if(farmingModeComboBox.displayText === "Arcarum" && itemSelectionComboBox.displayText === "Repeated Runs") {
+                        missionSelectionComboBox.model = [
+                            { text: "Arcarum", enabled: false },
+                            { text: "Point Aquila", enabled: true },
+                            { text: "Point Bellator", enabled: true },
+                            { text: "Point Celsus", enabled: true },
                         ]
                     }
 
@@ -1898,7 +1934,7 @@ Item{
                 amountSelectionStatusMessage.color = "#00ff00"
                 amountSelectionStatusMessage.text = qsTr("Amount of Items saved successfully")
 
-                if(farmingModeComboBox.displayText === qsTr("Coop")) {
+                if(farmingModeComboBox.displayText === qsTr("Coop") || farmingModeComboBox.displayText === qsTr("Arcarum")) {
                     // Reset the Summon Selection button and its relevant status message.
                     summonSelectionButton.enabled = false
                     summonSelectionButton.text = qsTr("Select Summon")
@@ -2237,12 +2273,8 @@ Item{
 
                 onClicked: {
                     testModeCheckBox.checked = !testModeCheckBox.checked
-
-                    if(testModeCheckBox.checked) {
-                        backend.check_bot_ready(true)
-                    }else{
-                        backend.check_bot_ready(false)
-                    }
+                    backend.check_bot_ready(testModeCheckBox.checked)
+                    backend.update_test_mode(testModeCheckBox.checked)
                 }
             }
         }

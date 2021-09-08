@@ -19,7 +19,7 @@ class ImageUtils:
 
     Attributes
     ----------
-    bot (bot.Game): The Game object.
+    game (bot.Game): The Game object.
 
     debug_mode (bool, optional): Optional flag to print debug messages related to this class. Defaults to False.
 
@@ -50,6 +50,10 @@ class ImageUtils:
         self._reader = easyocr.Reader(["en"], gpu = True)
         self._game.print_and_save(f"[INFO] EasyOCR reader initialized.")
 
+        # Used for skipping selecting the Summon Element every time on repeated runs.
+        self._summon_selection_first_run = True
+        self._summon_selection_same_element = False
+
     def update_window_dimensions(self, window_left: int, window_top: int, window_width: int, window_height: int):
         """Updates the window dimensions for PyAutoGUI to perform faster operations in.
 
@@ -62,12 +66,10 @@ class ImageUtils:
         Returns:
             None
         """
-        self._game.print_and_save(f"\n[INFO] Optimizing window dimensions...")
         self._window_left = window_left
         self._window_top = window_top
         self._window_width = window_width
         self._window_height = window_height
-        self._game.print_and_save(f"[INFO] Optimizing window dimensions complete.")
 
         return None
 
@@ -223,11 +225,17 @@ class ImageUtils:
             if tries <= 0 and self.confirm_location("select_a_summon", tries = 1) is False:
                 raise Exception("Could not reach the Summon Selection screen.")
 
+        # Determine if all the summon elements are the same or not. This will influence whether or not the bot needs to change elements in repeated runs.
+        self._summon_selection_same_element = all(element == summon_element_list[0] for element in summon_element_list)
+
         while summon_location is None:
-            current_summon_element = summon_element_list[summon_index]
-            if current_summon_element != last_summon_element:
-                # self._game.find_and_click_button(f"summon_{current_summon_element}")
-                last_summon_element = current_summon_element
+            if self._summon_selection_first_run or self._summon_selection_same_element is False:
+                current_summon_element = summon_element_list[summon_index]
+                if current_summon_element != last_summon_element:
+                    self._game.find_and_click_button(f"summon_{current_summon_element}")
+                    last_summon_element = current_summon_element
+
+                self._summon_selection_first_run = False
 
             summon_index = 0
             while summon_index <= len(summon_list):
@@ -254,6 +262,7 @@ class ImageUtils:
                             summon_index += 1
                     else:
                         guibot_check = True
+                        break
                 else:
                     break
 
@@ -432,7 +441,6 @@ class ImageUtils:
                                   "Leviathan Malice Anima", "Phronesis Anima"]
 
         self._game.print_and_save(f"[INFO] Now detecting item rewards...")
-        amounts_farmed = []
         guibot_check = False
 
         total_amount_farmed = 0
@@ -520,10 +528,11 @@ class ImageUtils:
         self._game.print_and_save(f"\n[INFO] Now waiting for {image_name} to vanish from screen...")
         self._file_resolver.add_path("images/buttons/")
         self._clear_memory_guibot()
-        if self._guibot.wait_vanish(image_name, timeout = timeout):
+        try:
+            self._guibot.wait_vanish(image_name, timeout = timeout)
             self._game.print_and_save(f"[SUCCESS] Image successfully vanished from screen...")
             return True
-        else:
+        except Exception:
             if suppress_error is False:
                 self._game.print_and_save(f"[WARNING] Image did not vanish from screen...")
             return False
