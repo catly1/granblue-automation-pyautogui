@@ -467,13 +467,13 @@ class CombatMode:
         xeno_clash_raids = ["Xeno Clash Raid"]
 
         # If the "Cancel" button vanishes, that means the attack is in-progress. Now reload the page and wait for either the attack to finish or Battle ended.
-        if self._game.farming_mode == "Raid" or \
-                event_raids.__contains__(self._game.mission_name) or \
-                rotb_raids.__contains__(self._game.mission_name) or \
-                dread_barrage_raids.__contains__(self._game.difficulty) or \
-                (self._game.farming_mode == "Proving Grounds" and proving_grounds_raids.__contains__(self._game.difficulty)) or \
-                (self._game.farming_mode == "Guild Wars" and guild_wars_raids.__contains__(self._game.difficulty)) or \
-                xeno_clash_raids.__contains__(self._game.mission_name):
+        if self._game.farming_mode == "Guild Wars":
+                # event_raids.__contains__(self._game.mission_name) or \
+                # rotb_raids.__contains__(self._game.mission_name) or \
+                # dread_barrage_raids.__contains__(self._game.difficulty) or \
+                # (self._game.farming_mode == "Proving Grounds" and proving_grounds_raids.__contains__(self._game.difficulty)) or \
+                # (self._game.farming_mode == "Guild Wars" and guild_wars_raids.__contains__(self._game.difficulty)) or \
+                # xeno_clash_raids.__contains__(self._game.mission_name):
 
             self._game.print_and_save("[COMBAT] Reloading now.")
             self._game.find_and_click_button("reload")
