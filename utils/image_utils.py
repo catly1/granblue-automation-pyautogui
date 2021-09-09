@@ -232,7 +232,7 @@ class ImageUtils:
             if self._summon_selection_first_run or self._summon_selection_same_element is False:
                 current_summon_element = summon_element_list[summon_index]
                 if current_summon_element != last_summon_element:
-                    self._game.find_and_click_button(f"summon_{current_summon_element}")
+                    # self._game.find_and_click_button(f"summon_{current_summon_element}")
                     last_summon_element = current_summon_element
 
                 self._summon_selection_first_run = False

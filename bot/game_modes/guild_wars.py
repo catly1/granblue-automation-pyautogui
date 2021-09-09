@@ -59,7 +59,7 @@ class GuildWars:
 
         if self._game.image_tools.confirm_location("guild_wars"):
             # Scroll the screen down a little bit.
-            self._game.mouse_tools.scroll_screen_from_home_button(-200)
+            # self._game.mouse_tools.scroll_screen_from_home_button(-200)
 
             # Perform different navigation actions based on whether the user wants to farm meat or to farm Nightmares.
             if difficulty == "Very Hard" or difficulty == "Extreme" or difficulty == "Extreme+":
