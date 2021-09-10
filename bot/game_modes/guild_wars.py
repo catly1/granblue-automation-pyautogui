@@ -119,7 +119,8 @@ class GuildWars:
                         self._game.mouse_tools.move_and_click_point(nightmare_locations[0][0], nightmare_locations[0][1], "guild_wars_nightmares")
                     elif difficulty == "NM95":
                         self._game.print_and_save(f"[GUILD.WARS] Now hosting NM95 now...")
-                        self._game.mouse_tools.move_and_click_point(nightmare_locations[1][0], nightmare_locations[1][1], "guild_wars_nightmares")
+                        # self._game.mouse_tools.move_and_click_point(nightmare_locations[1][0], nightmare_locations[1][1], "guild_wars_nightmares")
+                        self._game.mouse_tools.move_and_click_point(nightmare_locations[0][0], nightmare_locations[0][1], "guild_wars_nightmares")
                     elif difficulty == "NM100":
                         self._game.print_and_save(f"[GUILD.WARS] Now hosting NM100 now...")
                         self._game.mouse_tools.move_and_click_point(nightmare_locations[2][0], nightmare_locations[2][1], "guild_wars_nightmares")
