@@ -612,10 +612,10 @@ class CombatMode:
                 command_turn_number = int(command.split(":")[0].split(" ")[1])
 
                 # If the command is a "Turn #:" and it is currently not the correct Turn, attack until the Turn numbers match.
-                if self._retreat_check is False and turn_number != command_turn_number:
-                    self._game.print_and_save(f"[COMBAT] Attacking until the bot reaches Turn {command_turn_number}.")
-                    while turn_number != command_turn_number:
-                        turn_number = self._process_incorrect_turn(turn_number)
+                # if self._retreat_check is False and turn_number != command_turn_number:
+                #     self._game.print_and_save(f"[COMBAT] Attacking until the bot reaches Turn {command_turn_number}.")
+                #     while turn_number != command_turn_number:
+                #         turn_number = self._process_incorrect_turn(turn_number)
 
             elif turn_number == command_turn_number:
                 # Process all commands here that belong inside a Turn block.
@@ -639,7 +639,7 @@ class CombatMode:
                     # Now execute each Skill command starting from left to right.
                     skill_command_list = command.split(".")
                     skill_command_list.pop(0)  # Remove the "character" portion of the string.
-                    self._use_character_skill(character_selected, skill_command_list)
+                    self. _use_character_skill(character_selected, skill_command_list)
 
                 # Handle any other supported command.
                 elif command == "requestbackup":
