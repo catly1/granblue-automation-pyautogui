@@ -66,32 +66,21 @@ class GuildWars:
                 self._game.print_and_save(f"\n[GUILD.WARS] Now proceeding to farm meat.")
 
                 # Click on the banner to farm meat.
-                self._game.find_and_click_button("guild_wars_meat", grayscale = True)
+                self._game.find_and_click_button("guild_wars_meat")
+
+                self._game.wait(1.0)
 
                 if self._game.image_tools.confirm_location("guild_wars_meat"):
                     # Now click on the specified Mission to start. Also attempt at fixing the deadzone issue by looping.
-                    if difficulty == "Very Hard":
-                        self._game.print_and_save(f"[GUILD.WARS] Now hosting Very Hard now...")
-                        self._game.find_and_click_button("guild_wars_meat_very_hard")
-                        if not self._game.image_tools.wait_vanish("guild_wars_meat_very_hard", 3):
-                            self._game.find_and_click_button("guild_wars_meat_very_hard")
-                        else:
-                            return None
-                    elif difficulty == "Extreme":
-                        self._game.print_and_save(f"[GUILD.WARS] Now hosting Extreme now...")
-                        self._game.find_and_click_button("guild_wars_meat_extreme")
-                        if not self._game.image_tools.wait_vanish("guild_wars_meat_extreme", 3):
-                            self._game.find_and_click_button("guild_wars_meat_extreme")
-                        else:
-                            return None
-                    elif difficulty == "Extreme+":
-                        self._game.print_and_save(f"[GUILD.WARS] Now hosting Extreme+ now...")
-                        self._game.find_and_click_button("guild_wars_meat_extreme+")
-                        if not self._game.image_tools.wait_vanish("guild_wars_meat_extreme+", 3):
-                            self._game.find_and_click_button("guild_wars_meat_extreme+")
+                    formatted_mission_name = difficulty.replace(" ", "_")
+                    tries = 10
+                    self._game.print_and_save(f"[GUILD.WARS] Now hosting {difficulty} now...")
+                    while self._game.image_tools.wait_vanish("ap_30", 3) is False:
+                        self._game.find_and_click_button(f"guild_wars_meat_{formatted_mission_name}")
 
-                            # Alert the user if they did not unlock Extreme+ and stop the bot.
-                            if not self._game.image_tools.wait_vanish("guild_wars_meat_extreme+", 3):
+                        tries -= 1
+                        if tries <= 0:
+                            if difficulty == "Extreme+":
                                 self._game.image_tools.generate_alert("You did not unlock Extreme+ yet!")
                                 raise GuildWarsException("You did not unlock Extreme+ yet!")
             else:

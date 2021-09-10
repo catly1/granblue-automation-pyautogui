@@ -162,13 +162,19 @@ class Game:
         elif self.farming_mode == "Arcarum":
             self._arcarum = Arcarum(self, self.mission_name)
 
-        if test_mode is False:
-            # Calibrate the dimensions of the bot window on bot launch.
-            self.go_back_home(confirm_location_check = True, display_info_check = True)
-        else:
-            self.home_button_location = self.image_tools.find_button("home")
-            if self.home_button_location is None:
-                raise RuntimeError("Calibration of window dimensions failed. Is the Home button on the bottom bar visible?")
+        try:
+            if test_mode is False:
+                # Calibrate the dimensions of the bot window on bot launch.
+                self.go_back_home(confirm_location_check = True, display_info_check = True)
+            else:
+                self.home_button_location = self.image_tools.find_button("home")
+                if self.home_button_location is None:
+                    raise RuntimeError("Calibration of window dimensions failed. Is the Home button on the bottom bar visible?")
+        except Exception as e:
+            self.print_and_save(f"\n[ERROR] Bot encountered exception while setting up: \n{traceback.format_exc()}")
+            self.discord_queue.put(f"> Bot encountered exception while setting up: \n{e}")
+            self.image_tools.generate_alert(f"Bot encountered exception while setting up: \n{e}")
+            self.is_bot_running.value = 1
 
     def _print_time(self):
         """Formats the time since the bot started into a readable, printable HH:MM:SS format using timedelta.
@@ -205,10 +211,10 @@ class Game:
         Returns:
             None
         """
-        self.print_and_save("\n[INFO] Recalibrating the dimensions of the window...")
-
         # Save the location of the "Home" button at the bottom of the bot window.
         self.home_button_location = self.image_tools.find_button("home")
+
+        self.print_and_save("\n[INFO] Recalibrating the dimensions of the window...")
 
         if self.home_button_location is None:
             raise RuntimeError("Calibration of window dimensions failed. Is the Home button on the bottom bar visible?")
@@ -223,25 +229,42 @@ class Game:
         if home_menu_button is None:
             raise RuntimeError("Calibration of window dimensions failed. Is the Menu button visible on the Home screen?")
 
-        # Use the locations of the "News" and "Menu" buttons on the Home screen to calculate the dimensions of the bot window in the following
-        # format:
-        window_left = home_news_button[0] - 35  # The x-coordinate of the left edge.
-        window_top = home_menu_button[1] - 24  # The y-coordinate of the top edge.
-        window_width = window_left + 410  # The width of the region.
-        window_height = (self.home_button_location[1] + 24) - window_top  # The height of the region.
+        width, height = pyautogui.size()
+        additional_calibration_required = False
+        # if self.home_button_location[0] < (width / 2):
+        #     window_left = 0
+        #     window_top = 0
+        #     window_width = int(width / 3)
+        #     window_height = height
+        # elif self.home_button_location[0] > (width - (width / 2)):
+        #     window_left = int(width - width / 3)
+        #     window_top = 0
+        #     window_width = int(width / 3)
+        #     window_height = height
+        #     additional_calibration_required = True
+        # else:
+        #     window_left = 0
+        #     window_top = 0
+        #     window_width = width
+        #     window_height = height
 
-        self.image_tools.update_window_dimensions(window_left, window_top, window_width, window_height)
+        window_left = 0
+        window_top = 0
+        window_width = width
+        window_height = height
+
+        self.image_tools.update_window_dimensions(window_left, window_top, window_width, window_height, additional_calibration_required)
 
         self.print_and_save("[SUCCESS] Dimensions of the window has been successfully recalibrated.")
 
         if display_info_check:
             window_dimensions = self.image_tools.get_window_dimensions()
-            self.print_and_save("\n********************************************************************************")
-            self.print_and_save("********************************************************************************")
+            self.print_and_save("\n**********************************************************************")
+            self.print_and_save("**********************************************************************")
             self.print_and_save(f"[INFO] Screen Size: {pyautogui.size()}")
             self.print_and_save(f"[INFO] Game Window Dimensions: Region({window_dimensions[0]}, {window_dimensions[1]}, {window_dimensions[2]}, {window_dimensions[3]})")
-            self.print_and_save("********************************************************************************")
-            self.print_and_save("********************************************************************************")
+            self.print_and_save("**********************************************************************")
+            self.print_and_save("**********************************************************************")
 
         return None
 
@@ -273,11 +296,11 @@ class Game:
         return None
 
     @staticmethod
-    def wait(seconds: int = 3):
+    def wait(seconds: float = 3.0):
         """Wait the specified seconds to account for ping or loading.
 
         Args:
-            seconds (int, optional): Number of seconds for the execution to wait for. Defaults to 3.
+            seconds (float, optional): Number of seconds for the execution to wait for. Defaults to 3.0.
 
         Returns:
             None
@@ -285,15 +308,14 @@ class Game:
         time.sleep(seconds)
         return None
 
-    def find_and_click_button(self, button_name: str, clicks: int = 1, tries: int = 2, suppress_error: bool = False, grayscale: bool = False):
+    def find_and_click_button(self, button_name: str, clicks: int = 1, tries: int = 0, suppress_error: bool = False):
         """Find the center point of a button image and click it.
 
         Args:
             button_name (str): Name of the button image file in the /images/buttons/ folder.
             clicks (int): Number of mouse clicks when clicking the button image location. Defaults to 1.
-            tries (int): Number of tries to attempt to find the specified button image. Defaults to 2.
+            tries (int): Number of tries to attempt to find the specified button image. Defaults to 0 which will use ImageUtil's default.
             suppress_error (bool): Suppresses template matching error depending on boolean. Defaults to False.
-            grayscale (bool): Enables grayscale template matching. Defaults to False.
 
         Returns:
             (bool): Return True if the button was found and clicked. Otherwise, return False.
@@ -301,45 +323,86 @@ class Game:
         if self.debug_mode:
             self.print_and_save(f"[DEBUG] Attempting to find and click the button: \"{button_name}\".")
 
-        if button_name.lower() == "quest":
-            temp_location = self.image_tools.find_button("quest_blue", tries = tries, suppress_error = suppress_error)
-            if temp_location is None:
-                temp_location = self.image_tools.find_button("quest_red", tries = tries, suppress_error = suppress_error)
+        if tries == 0:
+            if button_name.lower() == "quest":
+                temp_location = self.image_tools.find_button("quest_blue")
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("quest_red")
 
-            if temp_location is not None:
-                self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "quest_blue", mouse_clicks = clicks)
-                return True
-        elif button_name.lower() == "raid":
-            temp_location = self.image_tools.find_button("raid_flat", tries = tries, suppress_error = suppress_error)
-            if temp_location is None:
-                temp_location = self.image_tools.find_button("raid_bouncing", tries = tries, suppress_error = suppress_error)
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "quest_blue", mouse_clicks = clicks)
+                    return True
+            elif button_name.lower() == "raid":
+                temp_location = self.image_tools.find_button("raid_flat")
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("raid_bouncing")
 
-            if temp_location is not None:
-                self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "raid_flat", mouse_clicks = clicks)
-                return True
-        elif button_name.lower() == "coop_start":
-            temp_location = self.image_tools.find_button("coop_start_flat", tries = tries, suppress_error = suppress_error)
-            if temp_location is None:
-                temp_location = self.image_tools.find_button("coop_start_faded", tries = tries, suppress_error = suppress_error)
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "raid_flat", mouse_clicks = clicks)
+                    return True
+            elif button_name.lower() == "coop_start":
+                temp_location = self.image_tools.find_button("coop_start_flat")
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("coop_start_faded")
 
-            if temp_location is not None:
-                self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "coop_start_flat", mouse_clicks = clicks)
-                return True
-        elif button_name.lower() == "event_special_quest":
-            temp_location = self.image_tools.find_button("event_special_quest", tries = tries, suppress_error = suppress_error)
-            if temp_location is None:
-                temp_location = self.image_tools.find_button("event_special_quest_flat", tries = tries, suppress_error = suppress_error)
-            if temp_location is None:
-                temp_location = self.image_tools.find_button("event_special_quest_bouncing", tries = tries, suppress_error = suppress_error)
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "coop_start_flat", mouse_clicks = clicks)
+                    return True
+            elif button_name.lower() == "event_special_quest":
+                temp_location = self.image_tools.find_button("event_special_quest")
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("event_special_quest_flat")
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("event_special_quest_bouncing")
 
-            if temp_location is not None:
-                self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "event_special_quest", mouse_clicks = clicks)
-                return True
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "event_special_quest", mouse_clicks = clicks)
+                    return True
+            else:
+                temp_location = self.image_tools.find_button(button_name.lower())
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], button_name, mouse_clicks = clicks)
+                    return True
         else:
-            temp_location = self.image_tools.find_button(button_name.lower(), tries = tries, grayscale_check = grayscale, suppress_error = suppress_error)
-            if temp_location is not None:
-                self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], button_name, mouse_clicks = clicks)
-                return True
+            if button_name.lower() == "quest":
+                temp_location = self.image_tools.find_button("quest_blue", tries = tries)
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("quest_red", tries = tries)
+
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "quest_blue", mouse_clicks = clicks)
+                    return True
+            elif button_name.lower() == "raid":
+                temp_location = self.image_tools.find_button("raid_flat", tries = tries)
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("raid_bouncing", tries = tries)
+
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "raid_flat", mouse_clicks = clicks)
+                    return True
+            elif button_name.lower() == "coop_start":
+                temp_location = self.image_tools.find_button("coop_start_flat", tries = tries)
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("coop_start_faded", tries = tries)
+
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "coop_start_flat", mouse_clicks = clicks)
+                    return True
+            elif button_name.lower() == "event_special_quest":
+                temp_location = self.image_tools.find_button("event_special_quest", tries = tries)
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("event_special_quest_flat", tries = tries)
+                if temp_location is None:
+                    temp_location = self.image_tools.find_button("event_special_quest_bouncing", tries = tries)
+
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], "event_special_quest", mouse_clicks = clicks)
+                    return True
+            else:
+                temp_location = self.image_tools.find_button(button_name.lower(), tries = tries, suppress_error = suppress_error)
+                if temp_location is not None:
+                    self.mouse_tools.move_and_click_point(temp_location[0], temp_location[1], button_name, mouse_clicks = clicks)
+                    return True
 
         return False
 
@@ -417,7 +480,7 @@ class Game:
 
         summon_location = self.image_tools.find_summon(summon_list, summon_element_list, self.home_button_location[0], self.home_button_location[1])
         if summon_location is not None:
-            self.mouse_tools.move_and_click_point(summon_location[0], summon_location[1], "template_support_summon")
+            self.mouse_tools.move_and_click_point(summon_location[0], summon_location[1], "template_support_summon", mouse_clicks = 2)
 
             # Check for CAPTCHA here. If detected, stop the bot and alert the user.
             self.check_for_captcha()
@@ -705,16 +768,16 @@ class Game:
 
         if not is_pending_battle and not is_event_nightmare and not skip_info:
             if self.item_name != "EXP" and self.item_name != "Angel Halo Weapons" and self.item_name != "Repeated Runs":
-                self.print_and_save("\n********************************************************************************")
-                self.print_and_save("********************************************************************************")
+                self.print_and_save("\n**********************************************************************")
+                self.print_and_save("**********************************************************************")
                 self.print_and_save(f"[FARM] Farming Mode: {self.farming_mode}")
                 self.print_and_save(f"[FARM] Mission: {self.mission_name}")
                 self.print_and_save(f"[FARM] Summons: {self.summon_list}")
                 self.print_and_save(f"[FARM] Amount of {self.item_name} gained from this run: {temp_amount}")
                 self.print_and_save(f"[FARM] Amount of {self.item_name} gained in total: {self.item_amount_farmed + temp_amount} / {self.item_amount_to_farm}")
                 self.print_and_save(f"[FARM] Amount of runs completed: {self._amount_of_runs_finished}")
-                self.print_and_save("********************************************************************************")
-                self.print_and_save("********************************************************************************\n")
+                self.print_and_save("**********************************************************************")
+                self.print_and_save("**********************************************************************\n")
 
                 if temp_amount != 0:
                     if self.item_amount_farmed >= self.item_amount_to_farm:
@@ -726,14 +789,14 @@ class Game:
 
                     self.discord_queue.put(discord_string)
             else:
-                self.print_and_save("\n********************************************************************************")
-                self.print_and_save("********************************************************************************")
+                self.print_and_save("\n**********************************************************************")
+                self.print_and_save("**********************************************************************")
                 self.print_and_save(f"[FARM] Farming Mode: {self.farming_mode}")
                 self.print_and_save(f"[FARM] Mission: {self.mission_name}")
                 self.print_and_save(f"[FARM] Summons: {self.summon_list}")
                 self.print_and_save(f"[FARM] Amount of runs completed: {self._amount_of_runs_finished} / {self.item_amount_to_farm}")
-                self.print_and_save("********************************************************************************")
-                self.print_and_save("********************************************************************************\n")
+                self.print_and_save("**********************************************************************")
+                self.print_and_save("**********************************************************************\n")
 
                 if self._amount_of_runs_finished >= self.item_amount_to_farm:
                     discord_string = f"> Runs completed for __{self.mission_name}__: **[{self._amount_of_runs_finished - 1} / {self.item_amount_to_farm}]** -> " \
@@ -745,16 +808,16 @@ class Game:
                 self.discord_queue.put(discord_string)
         elif is_pending_battle and temp_amount > 0 and not skip_info:
             if self.item_name != "EXP" and self.item_name != "Angel Halo Weapons" and self.item_name != "Repeated Runs":
-                self.print_and_save("\n********************************************************************************")
-                self.print_and_save("********************************************************************************")
+                self.print_and_save("\n**********************************************************************")
+                self.print_and_save("**********************************************************************")
                 self.print_and_save(f"[FARM] Farming Mode: {self.farming_mode}")
                 self.print_and_save(f"[FARM] Mission: {self.mission_name}")
                 self.print_and_save(f"[FARM] Summons: {self.summon_list}")
                 self.print_and_save(f"[FARM] Amount of {self.item_name} gained from this pending battle: {temp_amount}")
                 self.print_and_save(f"[FARM] Amount of {self.item_name} gained in total: {self.item_amount_farmed} / {self.item_amount_to_farm}")
                 self.print_and_save(f"[FARM] Amount of runs completed: {self._amount_of_runs_finished}")
-                self.print_and_save("********************************************************************************")
-                self.print_and_save("********************************************************************************\n")
+                self.print_and_save("**********************************************************************")
+                self.print_and_save("**********************************************************************\n")
 
                 if temp_amount != 0:
                     if self.item_amount_farmed >= self.item_amount_to_farm:
@@ -820,7 +883,7 @@ class Game:
 
             self.wait(1)
 
-            # If there is loot available, start loot detection and decrement number of raids joined as necessary.
+            # If there is loot available, start loot detection.
             if self.image_tools.confirm_location("no_loot", tries = 1):
                 self.print_and_save(f"[INFO] No loot can be collected.")
 
@@ -960,6 +1023,7 @@ class Game:
             if self.farming_mode == "Raid":
                 self.room_finder.disconnect()
 
+            self.image_tools.generate_alert(f"Bot encountered exception in Farming Mode: \n{e}")
             self.is_bot_running.value = 1
             return False
 
