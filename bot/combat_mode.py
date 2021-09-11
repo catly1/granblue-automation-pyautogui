@@ -596,8 +596,8 @@ class CombatMode:
 
             # All the logic that follows assumes that the command string is lowercase to allow case-insensitive commands.
             command = command_list.pop(0).strip().lower()
-            # if command == "" or command[0] == "#" or command[0] == "/":
-            #     continue
+            if command == "" or command[0] == "#" or command[0] == "/":
+                continue
 
             back_flag = False
 
@@ -736,7 +736,8 @@ class CombatMode:
         self._game.print_and_save("\n[COMBAT] Bot has reached end of script. Automatically attacking until battle ends or Party wipes...")
 
         # Execute this loop to keep manually pressing the "Attack"/"Next" button if the bot is not in Semi/Full Auto until combat ends.
-        while not self._retreat_check and not semi_auto and not full_auto:
+        while not self._retreat_check and not semi_auto and not full_auto and not self._game.image_tools.confirm_location("exp_gained", tries = 1) and \
+                not self._game.image_tools.confirm_location("no_loot", tries = 1):
             # Clear any detected dialog popups that might obstruct the "Attack" button.
             self._find_dialog_in_combat()
 
