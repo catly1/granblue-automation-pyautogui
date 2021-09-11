@@ -596,6 +596,7 @@ class CombatMode:
 
             # All the logic that follows assumes that the command string is lowercase to allow case-insensitive commands.
             command = command_list.pop(0).strip().lower()
+            self._game.print_and_save("[COMBAT] " + len(command_list))
             if command == "" or command[0] == "#" or command[0] == "/":
                 continue
 
