@@ -596,6 +596,7 @@ class CombatMode:
 
             # All the logic that follows assumes that the command string is lowercase to allow case-insensitive commands.
             command = command_list.pop(0).strip().lower()
+            self._game.print_and_save("[COMBAT] " + command_list)
             if command == "" or command[0] == "#" or command[0] == "/":
                 continue
 
@@ -684,7 +685,7 @@ class CombatMode:
                             # If the "Cancel" button fails to disappear after 10 tries, reload anyways.
                             self._game.find_and_click_button("reload")
                 elif command == "end":
-                    break
+                    continue
                 elif command == "exit":
                     # End Combat Mode by heading back to the Home screen without retreating.
                     self._game.print_and_save("\n[COMBAT] Leaving this Raid without retreating.")
@@ -731,79 +732,6 @@ class CombatMode:
 
                 if self._game.find_and_click_button("next", tries = 1, suppress_error = True):
                     self._game.wait(3)
-
-        while len(command_list) > 0 and command != "end" and command != "end":
-                            command = command_list.pop(0).strip().lower()
-                            if command == "" or command[0] == "#" or command[0] == "/":
-                                continue
-
-                            self._game.print_and_save(f"[COMBAT] Reading command for this Turn block: {command}")
-
-                            if command == "end":
-                                break
-                            elif command == "exit":
-                                # End Combat Mode by heading back to the Home screen without retreating.
-                                self._game.print_and_save("[COMBAT] Leaving this Raid without retreating.")
-                                self._game.print_and_save("\n################################################################################")
-                                self._game.print_and_save("################################################################################")
-                                self._game.print_and_save("[COMBAT] Ending Combat Mode.")
-                                self._game.print_and_save("################################################################################")
-                                self._game.print_and_save("################################################################################")
-                                self._game.go_back_home(confirm_location_check = True)
-                                return False
-
-                            # Determine which Character to take action.
-                            if "character1." in command:
-                                character_selected = 1
-                            elif "character2." in command:
-                                character_selected = 2
-                            elif "character3." in command:
-                                character_selected = 3
-                            elif "character4." in command:
-                                character_selected = 4
-                            else:
-                                character_selected = 0
-
-                            if character_selected != 0:
-                                # Select the specified Character.
-                                self._select_character(character_selected)
-
-                                # Now execute each Skill command starting from left to right.
-                                skill_command_list = command.split(".")
-                                skill_command_list.pop(0)  # Remove the "character" portion of the string.
-                                self._use_character_skill(character_selected, skill_command_list)
-
-                                # Check if the Battle ended suddenly.
-                                if self._game.image_tools.confirm_location("battle_concluded", tries = 1):
-                                    self._game.print_and_save("\n[COMBAT] Battle concluded suddenly.")
-                                    self._game.find_and_click_button("reload")
-                                    return True
-
-                            # Handle any other supported command.
-                            elif command == "requestbackup":
-                                self._request_backup()
-                            elif command == "tweetbackup":
-                                self._tweet_backup()
-                            elif self._healing_item_commands.__contains__(command):
-                                self._use_combat_healing_item(command)
-                            elif command.__contains__("summon"):
-                                self._use_summon(command)
-                            elif command == "enablesemiauto":
-                                self._game.print_and_save("[COMBAT] Bot will now attempt to enable Semi Auto...")
-                                semi_auto = True
-                                break
-                            elif command == "enablefullauto":
-                                self._game.print_and_save("[COMBAT] Bot will now attempt to enable Full Auto...")
-                                full_auto = self._game.find_and_click_button("full_auto")
-
-                                # If the bot failed to find and click the "Full Auto" button, fallback to the "Semi Auto" button.
-                                if not full_auto:
-                                    self._game.print_and_save("[COMBAT] Bot failed to find the \"Full Auto\" button. Falling back to Semi Auto.")
-                                    semi_auto = True
-                                break
-
-                            if self._game.find_and_click_button("next", tries = 1, suppress_error = True):
-                                break
 
         # When the bot reaches here, all the commands in the combat script has been processed.
         self._game.print_and_save("\n[COMBAT] Bot has reached end of script. Automatically attacking until battle ends or Party wipes...")
