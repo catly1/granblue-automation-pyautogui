@@ -1,9 +1,8 @@
 import datetime
-import multiprocessing
 import os
 import time
 from datetime import date
-from typing import List, Tuple
+from typing import List
 
 import cv2
 import easyocr
@@ -53,8 +52,6 @@ class ImageUtils:
 
         self._match_method = cv2.TM_CCOEFF_NORMED
         self._match_location = None
-
-        self._process = multiprocessing.Process(target = ImageUtils._play_captcha_sound)
 
         # Check if the temp folder is created in the images folder.
         current_dir = os.getcwd()
@@ -370,6 +367,9 @@ class ImageUtils:
             if self._debug_mode:
                 self._game.print_and_save(f"[DEBUG] Failed to detect any occurrences of {image_name.upper()} images.")
 
+        # Sort the matched locations.
+        filtered_locations.sort()
+
         return filtered_locations
 
     def find_farmed_items(self, item_name: str, take_screenshot: bool = True):
@@ -439,17 +439,16 @@ class ImageUtils:
                         check = True
 
             if not check:
-                if item_name not in blacklisted_items and item_name not in lite_blacklisted_items:
-                    location = (location.target.x, location.target.y)
-
-                # Adjust the width and height variables if EasyOCR cannot detect the numbers correctly.
-                left = location[0] + 10
-                top = location[1] - 5
-                width = 30
-                height = 25
-
-                # Create a screenshot in the specified region named "test" and save it in the /temp/ folder. Then use EasyOCR to extract text from it into a list.
-                test_image = pyautogui.screenshot("images/temp/test.png", region = (left, top, width, height))
+                # if item_name not in blacklisted_items and item_name not in lite_blacklisted_items:
+                #     location = (location.target.x, location.target.y)
+                #
+                # # Create a screenshot in the specified region named "test" and save it in the /temp/ folder. Then use EasyOCR to extract text from it into a list.
+                # # Adjust the width and height variables if EasyOCR cannot detect the numbers correctly.
+                # left = location[0] + 10
+                # top = location[1] - 5
+                # width = 30
+                # height = 25
+                # test_image = pyautogui.screenshot("images/temp/test.png", region = (left, top, width, height))
                 # test_image.show() # Uncomment this line of code to see what the bot captured for the region of the detected text.
                 result = self._reader.readtext("images/temp/test.png", detail = 0)
 
@@ -554,7 +553,7 @@ class ImageUtils:
 
     @staticmethod
     def _play_captcha_sound():
-        playsound("CAPTCHA.mp3")
+        playsound("CAPTCHA.mp3", block = False)
         return None
 
     def generate_alert_for_captcha(self):
@@ -563,21 +562,11 @@ class ImageUtils:
         Returns:
             None
         """
-        # Play the CAPTCHA.mp3.
-        if self._process.is_alive() is False:
-            self._process.start()
-
-            pyautogui.alert(
-                text = "Stopping bot. Please enter the CAPTCHA yourself and play this mission manually to its completion. \n\nIt is now highly recommended that you take a break of several hours and "
-                       "in the future, please reduce the amount of hours that you use this program consecutively without breaks in between.",
-                title = "CAPTCHA Detected!", button = "OK")
-
-            self._process.terminate()
-        else:
-            pyautogui.alert(
-                text = "Stopping bot. Please enter the CAPTCHA yourself and play this mission manually to its completion. \n\nIt is now highly recommended that you take a break of several hours and "
-                       "in the future, please reduce the amount of hours that you use this program consecutively without breaks in between.",
-                title = "CAPTCHA Detected!", button = "OK")
+        self._play_captcha_sound()
+        pyautogui.alert(
+            text = "Stopping bot. Please enter the CAPTCHA yourself and play this mission manually to its completion. \n\nIt is now highly recommended that you take a break of several hours and "
+                   "in the future, please reduce the amount of hours that you use this program consecutively without breaks in between.",
+            title = "CAPTCHA Detected!", button = "OK")
 
         return None
 
@@ -590,11 +579,7 @@ class ImageUtils:
         Returns:
             None
         """
-        if self._process.is_alive() is False:
-            self._process.start()
-            pyautogui.alert(text = message, title = "Exception Encountered", button = "OK")
-            self._process.terminate()
-        else:
-            pyautogui.alert(text = message, title = "Exception Encountered", button = "OK")
+        self._play_captcha_sound()
+        pyautogui.alert(text = message, title = "Exception Encountered", button = "OK")
 
         return None
