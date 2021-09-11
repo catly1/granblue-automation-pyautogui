@@ -729,8 +729,8 @@ class CombatMode:
 
                 turn_number += 1
 
-                if self._game.find_and_click_button("next", tries = 1, suppress_error = True):
-                    self._game.wait(3)
+                # if self._game.find_and_click_button("next", tries = 1, suppress_error = True):
+                #     self._game.wait(3)
 
                 self._game.print_and_save(f"[COMBAT] Starting Turn {turn_number}.")
 
