@@ -596,8 +596,8 @@ class CombatMode:
 
             # All the logic that follows assumes that the command string is lowercase to allow case-insensitive commands.
             command = command_list.pop(0).strip().lower()
-            if command == "" or command[0] == "#" or command[0] == "/":
-                continue
+            # if command == "" or command[0] == "#" or command[0] == "/":
+            #     continue
 
             back_flag = False
 
@@ -612,10 +612,10 @@ class CombatMode:
                 command_turn_number = int(command.split(":")[0].split(" ")[1])
 
                 # If the command is a "Turn #:" and it is currently not the correct Turn, attack until the Turn numbers match.
-                # if self._retreat_check is False and turn_number != command_turn_number:
-                #     self._game.print_and_save(f"[COMBAT] Attacking until the bot reaches Turn {command_turn_number}.")
-                #     while turn_number != command_turn_number:
-                #         turn_number = self._process_incorrect_turn(turn_number)
+                if self._retreat_check is False and turn_number != command_turn_number:
+                    self._game.print_and_save(f"[COMBAT] Attacking until the bot reaches Turn {command_turn_number}.")
+                    while turn_number != command_turn_number:
+                        turn_number = self._process_incorrect_turn(turn_number)
 
             elif turn_number == command_turn_number:
                 # Process all commands here that belong inside a Turn block.
