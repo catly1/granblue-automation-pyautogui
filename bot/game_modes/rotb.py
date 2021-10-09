@@ -47,31 +47,31 @@ class RiseOfTheBeasts:
             self._rotb_extreme_plus_group_number = config.get("rise_of_the_beasts", "rotb_extreme_plus_group_number")
             self._rotb_extreme_plus_party_number = config.get("rise_of_the_beasts", "rotb_extreme_plus_party_number")
             self._rotb_extreme_plus_amount = 0
+
+            if self._rotb_extreme_plus_combat_script == "":
+                self._game.print_and_save("[ROTB] Combat Script for Rise of the Beasts Extreme+ will reuse the one for Farming Mode.")
+                self._rotb_extreme_plus_combat_script = self._game.combat_script
+
+            if len(self._rotb_extreme_plus_summon_element_list) == 0:
+                self._game.print_and_save("[ROTB] Summon Elements for Rise of the Beasts Extreme+ will reuse the ones for Farming Mode.")
+                self._rotb_extreme_plus_summon_element_list = self._game.summon_element_list
+
+            if len(self._rotb_extreme_plus_summon_list) == 0:
+                self._game.print_and_save("[ROTB] Summons for Rise of the Beasts Extreme+ will reuse the ones for Farming Mode.")
+                self._rotb_extreme_plus_summon_list = self._game.summon_list
+
+            if self._rotb_extreme_plus_group_number == "":
+                self._game.print_and_save("[ROTB] Group Number for Rise of the Beasts Extreme+ will reuse the one for Farming Mode.")
+                self._rotb_extreme_plus_group_number = self._game.group_number
+            else:
+                self._rotb_extreme_plus_group_number = int(self._rotb_extreme_plus_group_number)
+
+            if self._rotb_extreme_plus_party_number == "":
+                self._game.print_and_save("[ROTB] Party Number for Rise of the Beasts Extreme+ will reuse the one for Farming Mode.")
+                self._rotb_extreme_plus_party_number = self._game.party_number
+            else:
+                self._rotb_extreme_plus_party_number = int(self._rotb_extreme_plus_party_number)
         # #### end of config.ini ####
-
-        if self._rotb_extreme_plus_combat_script == "":
-            self._game.print_and_save("[ROTB] Combat Script for Rise of the Beasts Extreme+ will reuse the one for Farming Mode.")
-            self._rotb_extreme_plus_combat_script = self._game.combat_script
-
-        if len(self._rotb_extreme_plus_summon_element_list) == 0:
-            self._game.print_and_save("[ROTB] Summon Elements for Rise of the Beasts Extreme+ will reuse the ones for Farming Mode.")
-            self._rotb_extreme_plus_summon_element_list = self._game.summon_element_list
-
-        if len(self._rotb_extreme_plus_summon_list) == 0:
-            self._game.print_and_save("[ROTB] Summons for Rise of the Beasts Extreme+ will reuse the ones for Farming Mode.")
-            self._rotb_extreme_plus_summon_list = self._game.summon_list
-
-        if self._rotb_extreme_plus_group_number == "":
-            self._game.print_and_save("[ROTB] Group Number for Rise of the Beasts Extreme+ will reuse the one for Farming Mode.")
-            self._rotb_extreme_plus_group_number = self._game.group_number
-        else:
-            self._rotb_extreme_plus_group_number = int(self._rotb_extreme_plus_group_number)
-
-        if self._rotb_extreme_plus_party_number == "":
-            self._game.print_and_save("[ROTB] Party Number for Rise of the Beasts Extreme+ will reuse the one for Farming Mode.")
-            self._rotb_extreme_plus_party_number = self._game.party_number
-        else:
-            self._rotb_extreme_plus_party_number = int(self._rotb_extreme_plus_party_number)
 
         self._game.print_and_save("[ROTB] Settings initialized for Rise of the Beasts Extreme+...")
         # #### end of Advanced Setup ####
@@ -110,7 +110,7 @@ class RiseOfTheBeasts:
 
                 # Once preparations are completed, start Combat mode.
                 if start_check and self._game.combat_mode.start_combat_mode(self._rotb_extreme_plus_combat_script, is_nightmare = True):
-                    self._game.collect_loot()
+                    self._game.collect_loot(is_completed = False, is_event_nightmare = True)
                     return True
 
         elif not self._enable_rotb_extreme_plus and self._game.image_tools.confirm_location("rotb_extreme_plus", tries = 2):
@@ -134,9 +134,9 @@ class RiseOfTheBeasts:
 
         # Go to the Event by clicking on the "Menu" button and then click the very first banner.
         self._game.find_and_click_button("home_menu")
-        banner_locations = self._game.image_tools.find_all("event_banner")
+        banner_locations = self._game.image_tools.find_all("event_banner", custom_confidence = 0.7)
         if len(banner_locations) == 0:
-            banner_locations = self._game.image_tools.find_all("event_banner_blue")
+            banner_locations = self._game.image_tools.find_all("event_banner_blue", custom_confidence = 0.7)
         self._game.mouse_tools.move_and_click_point(banner_locations[0][0], banner_locations[0][1], "event_banner")
 
         self._game.wait(1)
@@ -223,13 +223,14 @@ class RiseOfTheBeasts:
         Returns:
             (int): Number of runs completed.
         """
-        number_of_items_dropped: int = 0
+        runs_completed: int = 0
 
         # Start the navigation process.
         if first_run:
             self._navigate()
         elif self._game.find_and_click_button("play_again"):
-            self._game.check_for_popups()
+            if self._game.check_for_popups():
+                self._navigate()
         else:
             # If the bot cannot find the "Play Again" button, check for Pending Battles and then perform navigation again.
             self._game.check_for_pending()
@@ -249,8 +250,8 @@ class RiseOfTheBeasts:
 
                 # Now start Combat Mode and detect any item drops.
                 if self._game.combat_mode.start_combat_mode(self._game.combat_script):
-                    number_of_items_dropped = self._game.collect_loot()
+                    runs_completed = self._game.collect_loot(is_completed = True)
         else:
-            raise ROTBException("Failed to arrive at the Summon Selection screen.")
+            raise RiseOfTheBeastsException("Failed to arrive at the Summon Selection screen.")
 
-        return number_of_items_dropped
+        return runs_completed

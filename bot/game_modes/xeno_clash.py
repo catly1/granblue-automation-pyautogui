@@ -46,31 +46,31 @@ class XenoClash:
 
             self._xeno_clash_nightmare_group_number = config.get("xeno_clash", "xeno_clash_nightmare_group_number")
             self._xeno_clash_nightmare_party_number = config.get("xeno_clash", "xeno_clash_nightmare_party_number")
+
+            if self._xeno_clash_nightmare_combat_script == "":
+                self._game.print_and_save("[XENO.CLASH] Combat Script for Xeno Clash Nightmare will reuse the one for Farming Mode.")
+                self._xeno_clash_nightmare_combat_script = self._game.combat_script
+
+            if len(self._xeno_clash_nightmare_summon_element_list) == 0:
+                self._game.print_and_save("[XENO.CLASH] Summon Elements for Xeno Clash Nightmare will reuse the ones for Farming Mode.")
+                self._xeno_clash_nightmare_summon_element_list = self._game.summon_element_list
+
+            if len(self._xeno_clash_nightmare_summon_list) == 0:
+                self._game.print_and_save("[XENO.CLASH] Summons for Xeno Clash Nightmare will reuse the ones for Farming Mode.")
+                self._xeno_clash_nightmare_summon_list = self._game.summon_list
+
+            if self._xeno_clash_nightmare_group_number == "":
+                self._game.print_and_save("[XENO.CLASH] Group Number for Xeno Clash Nightmare will reuse the one for Farming Mode.")
+                self._xeno_clash_nightmare_group_number = self._game.group_number
+            else:
+                self._xeno_clash_nightmare_number = int(self._xeno_clash_nightmare_group_number)
+
+            if self._xeno_clash_nightmare_party_number == "":
+                self._game.print_and_save("[XENO.CLASH] Party Number for Xeno Clash Nightmare will reuse the one for Farming Mode.")
+                self._xeno_clash_nightmare_party_number = self._game.party_number
+            else:
+                self._xeno_clash_nightmare_party_number = int(self._xeno_clash_nightmare_party_number)
         # #### end of config.ini ####
-
-        if self._xeno_clash_nightmare_combat_script == "":
-            self._game.print_and_save("[XENO.CLASH] Combat Script for Xeno Clash Nightmare will reuse the one for Farming Mode.")
-            self._xeno_clash_nightmare_combat_script = self._game.combat_script
-
-        if len(self._xeno_clash_nightmare_summon_element_list) == 0:
-            self._game.print_and_save("[XENO.CLASH] Summon Elements for Xeno Clash Nightmare will reuse the ones for Farming Mode.")
-            self._xeno_clash_nightmare_summon_element_list = self._game.summon_element_list
-
-        if len(self._xeno_clash_nightmare_summon_list) == 0:
-            self._game.print_and_save("[XENO.CLASH] Summons for Xeno Clash Nightmare will reuse the ones for Farming Mode.")
-            self._xeno_clash_nightmare_summon_list = self._game.summon_list
-
-        if self._xeno_clash_nightmare_group_number == "":
-            self._game.print_and_save("[XENO.CLASH] Group Number for Xeno Clash Nightmare will reuse the one for Farming Mode.")
-            self._xeno_clash_nightmare_group_number = self._game.group_number
-        else:
-            self._xeno_clash_nightmare_number = int(self._xeno_clash_nightmare_group_number)
-
-        if self._xeno_clash_nightmare_party_number == "":
-            self._game.print_and_save("[XENO.CLASH] Party Number for Xeno Clash Nightmare will reuse the one for Farming Mode.")
-            self._xeno_clash_nightmare_party_number = self._game.party_number
-        else:
-            self._xeno_clash_nightmare_party_number = int(self._xeno_clash_nightmare_party_number)
 
         self._game.print_and_save("[XENO.CLASH] Settings initialized for Xeno Clash Nightmare...")
         # #### end of Advanced Setup ####
@@ -88,7 +88,7 @@ class XenoClash:
             if event_claim_loot_location is not None:
                 self._game.print_and_save("\n[XENO] Skippable Xeno Clash Nightmare detected. Claiming it now...")
                 self._game.mouse_tools.move_and_click_point(event_claim_loot_location[0], event_claim_loot_location[1], "event_claim_loot")
-                self._game.collect_loot(is_event_nightmare = True)
+                self._game.collect_loot(is_completed = False, is_event_nightmare = True)
                 return True
             else:
                 self._game.print_and_save("\n[XENO] Detected Xeno Clash Nightmare. Starting it now...")
@@ -122,7 +122,7 @@ class XenoClash:
 
                     # Once preparations are completed, start Combat Mode.
                     if start_check and self._game.combat_mode.start_combat_mode(self._xeno_clash_nightmare_combat_script, is_nightmare = True):
-                        self._game.collect_loot(is_event_nightmare = True)
+                        self._game.collect_loot(is_completed = False, is_event_nightmare = True)
                         return True
 
         elif not self._enable_xeno_clash_nightmare and self._game.image_tools.confirm_location("limited_time_quests", tries = 1):
@@ -131,7 +131,7 @@ class XenoClash:
             if event_claim_loot_location is not None:
                 self._game.print_and_save("\n[XENO] Skippable Xeno Clash Nightmare detected but user opted to not run it. Claiming it regardless...")
                 self._game.mouse_tools.move_and_click_point(event_claim_loot_location[0], event_claim_loot_location[1], "event_claim_loot")
-                self._game.collect_loot(is_event_nightmare = True)
+                self._game.collect_loot(is_completed = False, is_event_nightmare = True)
                 return True
             else:
                 self._game.print_and_save("\n[XENO] Xeno Clash Nightmare detected but user opted to not run it. Moving on...")
@@ -154,9 +154,9 @@ class XenoClash:
 
         # Go to the Event by clicking on the "Menu" button and then click the very first banner.
         self._game.find_and_click_button("home_menu")
-        event_banner_locations = self._game.image_tools.find_all("event_banner")
+        event_banner_locations = self._game.image_tools.find_all("event_banner", custom_confidence = 0.7)
         if len(event_banner_locations) == 0:
-            event_banner_locations = self._game.image_tools.find_all("event_banner_blue")
+            event_banner_locations = self._game.image_tools.find_all("event_banner_blue", custom_confidence = 0.7)
         self._game.mouse_tools.move_and_click_point(event_banner_locations[0][0], event_banner_locations[0][1], "event_banner")
 
         self._game.wait(1)
@@ -195,13 +195,14 @@ class XenoClash:
         Returns:
             (int): Number of runs completed.
         """
-        number_of_items_dropped: int = 0
+        runs_completed: int = 0
 
         # Start the navigation process.
         if first_run:
             self._navigate()
         elif self._game.find_and_click_button("play_again"):
-            self._game.check_for_popups()
+            if self._game.check_for_popups():
+                self._navigate()
         else:
             # If the bot cannot find the "Play Again" button, check for Pending Battles and then perform navigation again.
             self._game.check_for_pending()
@@ -221,8 +222,8 @@ class XenoClash:
 
                 # Now start Combat Mode and detect any item drops.
                 if self._game.combat_mode.start_combat_mode(self._game.combat_script):
-                    number_of_items_dropped = self._game.collect_loot()
+                    runs_completed = self._game.collect_loot(is_completed = True)
         else:
             raise XenoClashException("Failed to arrive at the Summon Selection screen.")
 
-        return number_of_items_dropped
+        return runs_completed

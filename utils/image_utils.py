@@ -298,7 +298,7 @@ class ImageUtils:
             if self._summon_selection_first_run or self._summon_selection_same_element is False:
                 current_summon_element = summon_element_list[summon_index]
                 if current_summon_element != last_summon_element:
-                    # self._game.find_and_click_button(f"summon_{current_summon_element}")
+                    self._game.find_and_click_button(f"summon_{current_summon_element}")
                     last_summon_element = current_summon_element
 
                 self._summon_selection_first_run = False
@@ -307,6 +307,11 @@ class ImageUtils:
             while summon_index < len(summon_list):
                 # Now try and find the Summon at the current index.
                 template = cv2.imread(f"images/summons/{summon_list[summon_index]}.png", 0)
+
+                # Crop the summon template image so that plus marks would not potentially obscure any match.
+                height, width = template.shape
+                template = template[0:height, 0:width - 40]
+
                 result_flag = self._match(template, custom_confidence)
 
                 if result_flag:
@@ -317,14 +322,14 @@ class ImageUtils:
 
                     summon_index += 1
 
-                    # If the bot reached the bottom of the page, scroll back up to the top and start searching for the next Summon.
-                    if self.find_button("bottom_of_summon_selection", tries = 1) is not None:
-                        self._game.print_and_save(f"[WARNING] Bot has reached the bottom of the page and found no suitable Summons. Resetting Summons now...")
-                        return None
+            # If the bot reached the bottom of the page, scroll back up to the top and start searching for the next Summon.
+            if self.find_button("bottom_of_summon_selection", tries = 1) is not None:
+                self._game.print_and_save(f"[WARNING] Bot has reached the bottom of the page and found no suitable Summons. Resetting Summons now...")
+                return None
 
-                    # If matching failed, scroll the screen down to see more Summons.
-                    self._game.mouse_tools.scroll_screen(home_button_x, home_button_y - 50, -700)
-                    self._game.wait(1.0)
+            # If matching failed, scroll the screen down to see more Summons.
+            self._game.mouse_tools.scroll_screen(home_button_x, home_button_y - 50, -700)
+            self._game.wait(1.0)
 
         self._game.print_and_save(f"[SUCCESS] Found {summon_list[summon_index].upper()} Summon at {summon_location}.")
         return summon_location
@@ -360,15 +365,14 @@ class ImageUtils:
                 else:
                     filtered_locations.append(location)
 
+            # Sort the matched locations.
+            filtered_locations.sort()
+
             if not hide_info:
-                for location in filtered_locations:
-                    self._game.print_and_save(f"[INFO] Occurrence for {image_name.upper()} found at: " + str(location))
+                self._game.print_and_save(f"[INFO] Occurrence for {image_name.upper()} found at: {filtered_locations}")
         else:
             if self._debug_mode:
                 self._game.print_and_save(f"[DEBUG] Failed to detect any occurrences of {image_name.upper()} images.")
-
-        # Sort the matched locations.
-        filtered_locations.sort()
 
         return filtered_locations
 
@@ -439,16 +443,13 @@ class ImageUtils:
                         check = True
 
             if not check:
-                # if item_name not in blacklisted_items and item_name not in lite_blacklisted_items:
-                #     location = (location.target.x, location.target.y)
-                #
-                # # Create a screenshot in the specified region named "test" and save it in the /temp/ folder. Then use EasyOCR to extract text from it into a list.
-                # # Adjust the width and height variables if EasyOCR cannot detect the numbers correctly.
-                # left = location[0] + 10
-                # top = location[1] - 5
-                # width = 30
-                # height = 25
-                # test_image = pyautogui.screenshot("images/temp/test.png", region = (left, top, width, height))
+                # Create a screenshot in the specified region named "test" and save it in the /temp/ folder. Then use EasyOCR to extract text from it into a list.
+                # Adjust the width and height variables if EasyOCR cannot detect the numbers correctly.
+                left = location[0] + 10
+                top = location[1] - 5
+                width = 30
+                height = 25
+                test_image = pyautogui.screenshot("images/temp/test.png", region = (left, top, width, height))
                 # test_image.show() # Uncomment this line of code to see what the bot captured for the region of the detected text.
                 result = self._reader.readtext("images/temp/test.png", detail = 0)
 

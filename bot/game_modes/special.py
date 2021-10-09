@@ -36,7 +36,7 @@ class Special:
 
         # #### config.ini ####
         self._enable_dimensional_halo = config.getboolean("dimensional_halo", "enable_dimensional_halo")
-        if self._enable_dimensional_halo:
+        if self._enable_dimensional_halo and self._mission_name == "VH Angel Halo":
             self._dimensional_halo_combat_script = config.get("dimensional_halo", "dimensional_halo_combat_script")
 
             self._dimensional_halo_summon_list = config.get("dimensional_halo", "dimensional_halo_summon_list").replace(" ", "_").split(",")
@@ -50,31 +50,31 @@ class Special:
             self._dimensional_halo_group_number = config.get("dimensional_halo", "dimensional_halo_group_number")
             self._dimensional_halo_party_number = config.get("dimensional_halo", "dimensional_halo_party_number")
             self._dimensional_halo_amount = 0
+
+            if self._dimensional_halo_combat_script == "":
+                self._game.print_and_save("[SPECIAL] Combat Script for Dimensional Halo will reuse the one for Farming Mode.")
+                self._dimensional_halo_combat_script = self._game.combat_script
+
+            if len(self._dimensional_halo_summon_element_list) == 0:
+                self._game.print_and_save("[SPECIAL] Summon Elements for Dimensional Halo will reuse the ones for Farming Mode.")
+                self._dimensional_halo_summon_element_list = self._game.summon_element_list
+
+            if len(self._dimensional_halo_summon_list) == 0:
+                self._game.print_and_save("[SPECIAL] Summons for Dimensional Halo will reuse the ones for Farming Mode.")
+                self._dimensional_halo_summon_list = self._game.summon_list
+
+            if self._dimensional_halo_group_number == "":
+                self._game.print_and_save("[SPECIAL] Group Number for Dimensional Halo will reuse the one for Farming Mode.")
+                self._dimensional_halo_group_number = self._game.group_number
+            else:
+                self._dimensional_halo_group_number = int(self._dimensional_halo_group_number)
+
+            if self._dimensional_halo_party_number == "":
+                self._game.print_and_save("[SPECIAL] Party Number for Dimensional Halo will reuse the one for Farming Mode.")
+                self._dimensional_halo_party_number = self._game.party_number
+            else:
+                self._dimensional_halo_party_number = int(self._dimensional_halo_party_number)
         # #### end of config.ini ####
-
-        if self._dimensional_halo_combat_script == "":
-            self._game.print_and_save("[SPECIAL] Combat Script for Dimensional Halo will reuse the one for Farming Mode.")
-            self._dimensional_halo_combat_script = self._game.combat_script
-
-        if len(self._dimensional_halo_summon_element_list) == 0:
-            self._game.print_and_save("[SPECIAL] Summon Elements for Dimensional Halo will reuse the ones for Farming Mode.")
-            self._dimensional_halo_summon_element_list = self._game.summon_element_list
-
-        if len(self._dimensional_halo_summon_list) == 0:
-            self._game.print_and_save("[SPECIAL] Summons for Dimensional Halo will reuse the ones for Farming Mode.")
-            self._dimensional_halo_summon_list = self._game.summon_list
-
-        if self._dimensional_halo_group_number == "":
-            self._game.print_and_save("[SPECIAL] Group Number for Dimensional Halo will reuse the one for Farming Mode.")
-            self._dimensional_halo_group_number = self._game.group_number
-        else:
-            self._dimensional_halo_group_number = int(self._dimensional_halo_group_number)
-
-        if self._dimensional_halo_party_number == "":
-            self._game.print_and_save("[SPECIAL] Party Number for Dimensional Halo will reuse the one for Farming Mode.")
-            self._dimensional_halo_party_number = self._game.party_number
-        else:
-            self._dimensional_halo_party_number = int(self._dimensional_halo_party_number)
 
         self._game.print_and_save("[SPECIAL] Settings initialized for Special...")
         # #### end of Advanced Setup ####
@@ -114,7 +114,7 @@ class Special:
 
                 # Once preparations are completed, start Combat Mode.
                 if start_check and self._game.combat_mode.start_combat_mode(self._dimensional_halo_combat_script, is_nightmare = True):
-                    self._game.collect_loot()
+                    self._game.collect_loot(is_completed = False, is_event_nightmare = True)
                     return True
 
         elif not self._enable_dimensional_halo and self._game.image_tools.confirm_location("limited_time_quests", tries = 1):
@@ -163,6 +163,8 @@ class Special:
             elif self._mission_name.find("EX ") == 0:
                 difficulty = "Extreme"
                 formatted_mission_name = self._mission_name[3:]
+            else:
+                formatted_mission_name = self._mission_name
 
             if self._game.image_tools.confirm_location("special"):
                 tries = 2
@@ -336,7 +338,8 @@ class Special:
         if first_run:
             self._navigate()
         elif self._game.find_and_click_button("play_again"):
-            self._game.check_for_popups()
+            if self._game.check_for_popups():
+                self._navigate()
         else:
             # If the bot cannot find the "Play Again" button, check for Pending Battles and then perform navigation again.
             self._game.check_for_pending()
@@ -356,7 +359,7 @@ class Special:
 
                 # Now start Combat Mode and detect any item drops.
                 if self._game.combat_mode.start_combat_mode(self._game.combat_script):
-                    number_of_items_dropped = self._game.collect_loot()
+                    number_of_items_dropped = self._game.collect_loot(is_completed = True)
         else:
             raise SpecialException("Failed to arrive at the Summon Selection screen.")
 
